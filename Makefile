@@ -1,5 +1,6 @@
 BIN = forego
-SRC = $(shell ls *.go)
+GOFILES = $(shell find . -name '*.go' -not -path './vendor/*')
+GOPACKAGES = $(shell go list ./...  | grep -v /vendor/)
 
 .PHONY: all build clean lint release test
 
@@ -10,14 +11,14 @@ build: $(BIN)
 clean:
 	rm -f $(BIN)
 
-lint: $(SRC)
+lint: $(GOFILES)
 	go fmt
 
 release:
 	bin/release
 
 test: lint build
-	go test -v -race -cover ./...
+	@go test -v -race -cover $(GOPACKAGES)
 
-$(BIN): $(SRC)
+$(BIN): $(GOFILES)
 	go build -o $@
